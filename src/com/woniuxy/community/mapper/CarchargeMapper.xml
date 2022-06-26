@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.CarchargeMapper">
+    <resultMap id="carchargemap" type="CarchargeBean" autoMapping="true">
+        <result property="payDate" column="pay_date" javaType="date"></result>
+        <result property="endDate" column="end_date" javaType="string"></result>
+
+        <association property="ownerId" javaType="OwnerBean" autoMapping="true">
+            <result property="username" column="username"></result>
+
+        </association>
+        <association property="parkId" javaType="ParkingBean" autoMapping="true">
+            <result property="numbers" column="numbers"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectByNum" resultMap="carchargemap">
+        select p.numbers,o.username,c.pay_date,c.end_date,c.money,c.status from carcharge as c left join owner as o on o.id = c.owner_id
+            left join parking as p on c.park_id = p.id
+        <where>
+                <if test="num != null and num != ''">
+                    p.numbers like concat(#{num},'%')
+                </if>
+                <if test="status != null and status != ''">
+                    and c.status = #{status}
+                </if>
+        </where>
+    </select>
+
+
+    <insert id="savecarcharge"  useGeneratedKeys="true" keyProperty="id">
+        insert into carcharge (pay_date,end_date,money,status,owner_id,type,park_id) values
+            <foreach collection="carchargeBeans" item="cBean" separator=",">
+                (#{cBean.payDate},#{cBean.endDate},#{cBean.money},#{cBean.status},#{cBean.ownerId.id}
+                ,#{cBean.type},#{cBean.parkId.id})
+            </foreach>
+    </insert>
+
+    <update id="updatecarcharge">
+        update  carcharge set status = #{status}  where id = #{id}
+    </update>
+
+
+    <delete id="deleteById">
+        delete from carcharge where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deletecarcharge">
+        delete from carcharge where id = #{id}
+    </delete>
+
+</mapper>

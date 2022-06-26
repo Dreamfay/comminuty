@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.EmpMapper">
+    <resultMap id="carchargemap" type="CarchargeBean" autoMapping="true">
+        <result property="payDate" column="pay_date" javaType="date"></result>
+        <result property="endDate" column="end_date" javaType="string"></result>
+
+        <association property="ownerId" javaType="OwnerBean" autoMapping="true">
+            <result property="username" column="username"></result>
+
+        </association>
+        <association property="parkId" javaType="ParkingBean" autoMapping="true">
+            <result property="numbers" column="numbers"></result>
+        </association>
+    </resultMap>
+    <select id="selectByno" resultType="Emp">
+    select * from emp where deptno=#{deptno}
+
+    </select>
+
+    <select id="selectPre" resultType="Emp">
+        select * from emp where deptno=#{deptno}
+    </select>
+
+    <insert id="saveEmp"  useGeneratedKeys="true" keyProperty="id">
+
+        insert into emp (empname,deptno,sal) values
+        <foreach collection="emps" item="emp" separator=",">
+            (#{emp.empno},#{emp.deptno},#{emp.sal})
+        </foreach>
+
+    </insert>
+
+
+
+    <update id="updateEmp">
+        update  emp
+      <set>
+           <if test="sal != null">
+                sal = #{sal}
+           </if>
+       </set>
+    </update>
+
+
+    <delete id="deleteById">
+        delete from carcharge where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.RepairMapper">
+
+    <resultMap id="repairRes" type="RepairBean" autoMapping="true">
+        <id property="id" column="rid"></id>
+        <result property="comDate" column="com_date"></result>
+        <result property="remarks" column="rremarks"></result>
+        <result property="status" column="rstatus"></result>
+
+        <association property="repairtype" javaType="RepairtypeBean" autoMapping="true">
+        </association>
+        <association property="owner" javaType="OwnerBean" autoMapping="true">
+        </association>
+    </resultMap>
+
+    <select id="getCountBean" resultMap="getCountBean1">
+        select
+            rt.name as typeName,
+            count(*) as num
+        from repair as r left join repairtype as rt on rt.id = r.com_id
+        group by r.com_id
+    </select>
+<!--    java.util.HashMap-->
+    <resultMap id="getCountBean1" type="GetCountBean">
+        <result column="typeName" property="typeName" />
+        <result column="num" property="num" />
+    </resultMap>
+
+    <select id="getTypeCount" resultMap="getCountBean2">
+        select
+
+            count(*) as num
+        from repair as r left join repairtype as rt on rt.id = r.com_id
+        group by r.com_id
+    </select>
+    <resultMap id="getCountBean2" type="HashMap">
+
+    </resultMap>
+
+    <select id="selectRepair" resultMap="repairRes">
+        select r.id as rid,rt.name,r.remarks as rremarks,o.username,r.com_date,r.status as rstatus,r.clr from repair as r
+        left join repairtype as rt on rt.id = r.com_id
+        left join owner as o on o.id = r.owner_id
+        <where>
+            <if test="comId != null">
+                r.com_id = #{comId}
+            </if>
+            <if test="status != null">
+                and r.status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteRepair">
+        delete from repair where id = #{id}
+    </delete>
+
+    <delete id="deleteRepairById">
+        delete from repair where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateRepair">
+        update repair set status = #{status} where id = #{id}
+    </update>
+</mapper>

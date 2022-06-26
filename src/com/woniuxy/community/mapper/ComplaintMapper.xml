@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.ComplaintMapper">
+        <resultMap id="complaintRes" type="ComplaintBean" autoMapping="true">
+        <result property="comDate" column="com_date"></result>
+            <association property="complaintType" javaType="ComplaintTypeBean" autoMapping="true">
+
+            </association>
+            <association property="ownerBean" javaType="OwnerBean" autoMapping="true">
+
+            </association>
+        </resultMap>
+
+        <select id="selectComplaint" resultMap="complaintRes">
+            select ct.name,com.remarks,o.username,com.com_date,com.status,com.clr from complaint as com left join complaint_type as ct on ct.id = com.com_id
+            left join owner as o on o.id = com.owner_id
+        <where>
+            <if test="comId != null">
+                com.com_id = #{comId}
+            </if>
+            <if test="status != null">
+                and com.status = #{status}
+            </if>
+        </where>
+        </select>
+
+        <delete id="deleteComplaint">
+            delete from complaint where id = #{id}
+        </delete>
+
+        <delete id="deleteComplaintById">
+            delete from complaint where id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+
+        </delete>
+
+        <update id="updateComplaint">
+            update complaint set status = #{status} where id = #{id}
+        </update>
+</mapper>

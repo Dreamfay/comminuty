@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.RecordsMapper">
+
+    <resultMap id="recordsmap" type="RecordsBean" autoMapping="true">
+        <id property="id" column="id"></id>
+        <result property="checkTime" column="check_time"></result>
+
+        <collection property="houseBean" javaType="list" ofType="HouseBean" autoMapping="true">
+            <id property="id" column="id"></id>
+            <result property="numbers" column="hnum"></result>
+            <collection property="ownerBean" javaType="list" ofType="OwnerBean" autoMapping="true">
+                <result property="username" column="oname" javaType="string"></result>
+            </collection>
+        </collection>
+        <collection property="typeBean" javaType="list" ofType="PropertyTypeBean" autoMapping="true">
+            <id property="id" column="id"></id>
+            <result property="name" column="pname" javaType="string"></result>
+        </collection>
+
+    </resultMap>
+
+    <select id="selectByNum" resultMap="recordsmap">
+        select h.numbers as hnum,o.username as oname,p.name as pname,r.num,r.num2,r.check_time,r.meter
+        from records as r left join house as h on h.id = r.house_id
+            left join owner as o on o.house_id = h.id
+        left join property_type as p on r.type_id = p.id
+        <where>
+            <if test="num != null and num != ''">
+                h.numbers like concat(#{num},'%')
+            </if>
+            <if test="name != null and name != ''">
+                and p.name like concat(#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveRecords"  useGeneratedKeys="true" keyProperty="id">
+            insert into records (house_id,type_id,num2,check_time,meter,remarks) values
+            (#{houseId},#{typeId},#{num2},#{checkTime},#{meter},#{remarks})
+    </insert>
+
+    <delete id="deleteById">
+        delete from records where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRecords">
+        delete from records where id = #{id}
+    </delete>
+
+</mapper>

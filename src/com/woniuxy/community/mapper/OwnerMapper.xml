@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+<mapper namespace="com.woniuxy.community.mapper.OwnerMapper">
+
+    <resultMap id="OwnerResMap" type="OwnerBean" autoMapping="true">
+        <id property="id" column="id" javaType="long"></id>
+        <result property="username" column="username" javaType="string"></result>
+        <result property="tel" column="tel" javaType="string"></result>
+        <result property="sex" column="sex" javaType="string"></result>
+        <result property="identity" column="identity" javaType="string"></result>
+        <result property="houseId" column="house_id" javaType="long"></result>
+        <result property="remarks" column="remarks" javaType="string"></result>
+        <result property="password" column="password" javaType="string"></result>
+    </resultMap>
+
+    <delete id="deleteOwner">
+        delete from owner where id=#{id}
+    </delete>
+
+    <update id="updateOwner">
+        update owner set username=#{username},sex=#{sex},tel=#{tel},identity=#{identity}
+                       ,house_id=(select id from house where numbers=#{houseId}) where id=#{id}
+    </update>
+
+    <insert id="saveOwner" useGeneratedKeys="true" keyProperty="id">
+        insert into owner (username,sex,tel,identity,house_id) values
+            (#{username},#{sex},#{tel},#{identity},(select id from house where numbers=#{houseId}))
+    </insert>
+
+    <select id="selectByTel" resultMap="OwnerResMap">
+        select username,sex,tel,identity,h.numbers as houseId from owner left join house
+            as h on house_id = h.id where tel like concat(#{tel},'%') and identity like concat(#{identity},'%')
+    </select>
+
+
+    <resultMap id="ownermap" type="OwnerBean" autoMapping="true">
+        <id property="id" column="id" javaType="long"></id>
+        <result property="username" column="ousername" javaType="string"></result>
+        <result property="tel" column="otel" javaType="string"></result>
+        <result property="sex" column="osex" javaType="string"></result>
+        <result property="identity" column="oidentity" javaType="string"></result>
+
+        <collection property="houses" javaType="list" ofType="HouseBean">
+            <id property="id" column="h.id" javaType="int"></id>
+            <result property="numbers" column="humbers" javaType="string"></result>
+            <result property="area" column="area" javaType="double"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectPre" resultMap="ownermap">
+        select o.username as ousername,o.sex as osex,o.tel as otel,o.identity as oidentity,h.numbers as humbers,h.area as area
+        from owner as o left join house as h on o.house_id = h.id
+            <where>
+            <if test="str != null and str != ''">
+                o.username like concat(#{str},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

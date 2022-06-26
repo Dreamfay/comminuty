@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+<mapper namespace="com.woniuxy.community.mapper.ParkingMapper">
+    <resultMap id="parkmap" type="ParkingBean" autoMapping="true">
+        <id property="id" column="id" javaType="int"></id>
+        <result property="ownerId" column="owner_id" javaType="int"></result>
+    </resultMap>
+    <delete id="deletePark">
+        delete from parking where id=#{id}
+    </delete>
+
+    <update id="updatePark">
+        update parking set numbers=#{numbers},status=#{status},owner_id=#{ownerId}
+        where id = #{id}
+    </update>
+
+    <insert id="savePark" useGeneratedKeys="true" keyProperty="id">
+        insert into parking (numbers,status,owner_id) values (#{numbers},#{status},#{ownerId})
+    </insert>
+
+    <select id="selectByNum" resultMap="parkmap">
+        select * from parking where
+        numbers like concat(#{number},'%')
+    </select>
+</mapper>

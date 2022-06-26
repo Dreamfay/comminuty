@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+<mapper namespace="com.woniuxy.community.mapper.BuildingMapper">
+
+    <resultMap id="BuildResMap" type="BuildingBean" autoMapping="true">
+        <id property="id" column="id" javaType="long"></id>
+        <result property="numbers" column="numbers" javaType="string"></result>
+        <result property="uints" column="uints" javaType="string"></result>
+        <result property="remarks" column="remarks" javaType="string"></result>
+    </resultMap>
+
+    <delete id="deleteBuilding">
+        delete from building where id=#{id}
+    </delete>
+
+    <update id="updateBuilding">
+        update building
+    <set >
+        <if test="numbers != null">numbers =#{numbers},</if>
+        <if test="uints != null">uints =#{uints},</if>
+        <if test="remarks != null">remarks=#{remarks}</if>
+    </set>
+        where id=#{id}
+    </update>
+
+    <insert id="saveBuilding" useGeneratedKeys="true" keyProperty="id">
+        insert into building (numbers,uints,remarks) values (#{numbers},#{uints},#{remarks})
+    </insert>
+
+    <select id="selectByNum" resultMap="BuildResMap">
+        select * from building where numbers like concat(#{str},'%')
+    </select>
+
+</mapper>

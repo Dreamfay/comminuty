@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.HouseMapper">
+
+
+    <resultMap id="housemap" type="HouseBean" autoMapping="true">
+        <id property="id" column="h.id" javaType="int"></id>
+        <result property="numbers" column="numbers" javaType="string"></result>
+        <result property="intoDate" column="into_date" javaType="java.sql.Timestamp"></result>
+        <result property="area" column="area" javaType="double"></result>
+        <association property="buildingId" javaType="BuildingBean" >
+        <id property="id" column="b.id" javaType="int"></id>
+        <result property="numbers" column="numbers" javaType="string"></result>
+        <result property="uints" column="uints" javaType="string"></result>
+        </association>
+    </resultMap>
+
+
+    <select id="selectPre" resultMap="housemap">
+        select h.numbers,h.area,h.into_date,b.numbers,b.uints
+        from house as h left join building as b on h.building_id = b.id
+        <where>
+            <if test="str != null and str != ''">
+                h.numbers like concat(#{str},'%')
+            </if>
+        </where>
+
+    </select>
+
+
+
+
+
+
+    <resultMap id="HouseResMap" type="HouseBean" autoMapping="true">
+        <id property="id" column="id" javaType="int"></id>
+        <result property="numbers" column="numbers" javaType="string"></result>
+        <result property="intoDate" column="into_date" javaType="java.sql.Timestamp"></result>
+
+    </resultMap>
+
+    <delete id="deleteHouse">
+        delete from house where id=#{id}
+    </delete>
+
+    <update id="updateHouse">
+        update house set numbers =#{numbers},building_id =#{buildingId}
+                       ,area=#{area},into_date=#{intoDate},status=#{status} where id=#{id}
+    </update>
+
+    <insert id="saveHouse" useGeneratedKeys="true" keyProperty="id">
+        insert into house (numbers,building_id,area,into_date,status) values
+        (#{numbers},#{buildingId},#{area},#{intoDate},#{status})
+    </insert>
+
+    <select id="selectByNum" resultMap="HouseResMap">
+        select * from house where numbers like concat(#{str},'%')
+    </select>
+
+</mapper>

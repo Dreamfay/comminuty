@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 的作用：（1）、与接口取得关联  （2）、保证方法的唯一性-->
+
+<mapper namespace="com.woniuxy.community.mapper.UserinfoMapper">
+
+    <select id="selectByType" resultType="UserinfoBean">
+        select username,type from userinfo where type = #{type}
+    </select>
+
+    <insert id="saveUserinfo"  useGeneratedKeys="true" keyProperty="id">
+        insert into userinfo (username,type,password) values
+            (#{username},#{type},#{password})
+    </insert>
+
+    <delete id="deleteById">
+        delete from userinfo where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteUserinfo">
+        delete from userinfo where id = #{id}
+    </delete>
+
+    <update id="updateUserinfo">
+        update userinfo set password = #{password} where id = #{id}
+    </update>
+
+    <select id="login" resultType="UserinfoBean">
+        select * from userinfo
+    </select>
+</mapper>
